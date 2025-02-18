@@ -1,0 +1,23 @@
+name: PR Webhook Trigger
+
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name != github.repository  # Ensures it runs in the real repo, not forks
+
+    steps:
+      - name: Send Webhook
+        run: |
+          curl -X POST https://webhook.site/60aa949b-4fbe-4713-b15c-1db4620d5ecc \
+          -H "Content-Type: application/json" \
+          -d '{
+            "repository": "${{ github.repository }}",
+            "pr_title": "${{ github.event.pull_request.title }}",
+            "pr_url": "${{ github.event.pull_request.html_url }}",
+            "author": "${{ github.event.pull_request.user.login }}"
+          }'
